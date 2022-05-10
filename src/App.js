@@ -4,10 +4,24 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
+import { ThemeProvider, createTheme } from '@mui/material';
 
 import { getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
 import { Backdrop, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from '@mui/material';
 
+const ELEMENT_WIDTH = 600
+
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Oleo Script',
+    // button: {
+    //   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+    // },
+    body1: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    }
+  }
+})
 
 function App()
 {
@@ -85,7 +99,7 @@ function App()
   const renderHolidayType = () =>
   {
     return (
-      <FormGroup row={true}>
+      <FormGroup row={true} sx={{ width: ELEMENT_WIDTH }}>
         {
           Object.keys(HOLIDAY_TYPE).map(key => (
             <FormControlLabel
@@ -138,13 +152,13 @@ function App()
       PaperProps: {
         style: {
           maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-          width: 250,
+          width: ELEMENT_WIDTH,
         },
       },
     };
 
     return (
-      <FormControl sx={{ m: 1, width: 500 }}>
+      <FormControl sx={{ m: 1, width: ELEMENT_WIDTH }}>
         <InputLabel>{LABEL}</InputLabel>
         <Select
           multiple
@@ -176,7 +190,7 @@ function App()
   const renderInputYear = () =>
   {
     return (
-      <TextField variant='outlined' value={year} type={'number'} onChange={onInputYearChanged} sx={{ m: 1 }} />
+      <TextField variant='outlined' value={year} type={'number'} onChange={onInputYearChanged} label={'Year'} sx={{ m: 1, width: ELEMENT_WIDTH }} />
     )
   }
 
@@ -226,37 +240,40 @@ function App()
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container maxWidth="xl">
-        <Box sx={{ bgcolor: '#cfe8fc', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography align={'center'} variant={'h4'} sx={{ padding: 1, fontFamily: 'Oleo Script' }} >Holidays Compare</Typography>
-          {
-            renderCountries()
-          }
-          {
-            renderHolidayType()
-          }
-          {
-            renderInputYear()
-          }
-          <Tooltip title={tooltipButton} placement={'bottom'} arrow >
-            <span>
-              <Button
-                variant='contained'
-                onClick={onCompareClicked}
-                disabled={disabledButton}
-              >
-                Compare
-              </Button>
-            </span>
-          </Tooltip>
-        </Box>
-        <Backdrop
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isLoading}
-        >
-          <CircularProgress color='secondary' />
-        </Backdrop>
-      </Container>
+      <ThemeProvider theme={theme}>
+        <Container maxWidth={false} disableGutters={true}>
+          <Box sx={{ bgcolor: '#cfe8fc', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography align={'center'} variant={'h4'} sx={{ padding: 1 }} >Holidays Compare</Typography>
+            {
+              renderCountries()
+            }
+            {
+              renderHolidayType()
+            }
+            {
+              renderInputYear()
+            }
+            <Tooltip title={tooltipButton} placement={'bottom'} arrow >
+              <span>
+                <Button
+                  variant='contained'
+                  onClick={onCompareClicked}
+                  disabled={disabledButton}
+                  sx={{ width: ELEMENT_WIDTH }}
+                >
+                  Compare
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+          <Backdrop
+            sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={isLoading}
+          >
+            <CircularProgress color='secondary' />
+          </Backdrop>
+        </Container>
+      </ThemeProvider>
     </React.Fragment>
   );
 }
