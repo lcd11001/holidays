@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 
 
 import { getHolidayFree, getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
-import { Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip, Typography } from '@mui/material';
 
 
 function App()
@@ -17,27 +17,27 @@ function App()
   const [countriesID, setCountriesID] = useState([])
   const [countriesName, setCountriesName] = useState([])
 
-  useEffect(() =>
-  {
-    let holidayVN = localStorage.getItem('VN-national')
-    if (holidayVN)
-    {
-      console.log('holidays from local storage', JSON.parse(holidayVN))
-      return
-    }
-    // getHolidaysFree('VN', 2022)
-    getHolidays('VN', 2022, ['national'])
-      .then(holidays =>
-      {
-        console.log('holidays', holidays)
-        localStorage.setItem('VN-national', JSON.stringify(holidays, null, 2))
-      })
-      .catch(err =>
-      {
-        console.error(err)
-      })
+  // useEffect(() =>
+  // {
+  //   let holidayVN = localStorage.getItem('VN-national')
+  //   if (holidayVN)
+  //   {
+  //     console.log('holidays from local storage', JSON.parse(holidayVN))
+  //     return
+  //   }
+  //   // getHolidaysFree('VN', 2022)
+  //   getHolidays('VN', 2022, ['national'])
+  //     .then(holidays =>
+  //     {
+  //       console.log('holidays', holidays)
+  //       localStorage.setItem('VN-national', JSON.stringify(holidays, null, 2))
+  //     })
+  //     .catch(err =>
+  //     {
+  //       console.error(err)
+  //     })
 
-  }, [])
+  // }, [])
 
   useEffect(() =>
   {
@@ -64,7 +64,7 @@ function App()
 
   const onHolidayTypeChanged = (e, checked) =>
   {
-    // console.log('value', e.target.value, 'checked', checked)
+    console.log('value', e.target.value, 'checked', checked)
     if (checked)
     {
       setHolidayTypes(oldValues => oldValues.concat(e.target.value))
@@ -83,10 +83,11 @@ function App()
           Object.keys(HOLIDAY_TYPE).map(key => (
             <FormControlLabel
               key={key}
+              value={key}
               control={<Checkbox checked={holidayTypes.includes(key)} />}
               onChange={onHolidayTypeChanged}
               label={
-                <Tooltip title={HOLIDAY_TYPE[key]}>
+                <Tooltip title={HOLIDAY_TYPE[key]} placement={'top'} arrow>
                   <Typography>{key}</Typography>
                 </Tooltip>
               }
@@ -159,6 +160,29 @@ function App()
     )
   }
 
+  const onCompareClicked = (e) =>
+  {
+    console.log('onCompareClicked', countriesID.join(', '), 'types', holidayTypes.join(', '))
+  }
+
+  const renderButtonTooltip = () =>
+  {
+    if (countriesID.length === 0)
+    {
+      return 'Please select at least 1 country'
+    }
+
+    if (holidayTypes.length === 0)
+    {
+      return 'Please select at least 1 holiday type'
+    }
+
+    return ''
+  }
+
+  const disabledButton = countriesID.length === 0 || holidayTypes.length === 0
+  const tooltipButton = renderButtonTooltip()
+
   return (
     <React.Fragment>
       <CssBaseline />
@@ -171,6 +195,17 @@ function App()
           {
             renderHolidayType()
           }
+          <Tooltip title={tooltipButton} placement={'bottom'} arrow >
+            <span>
+              <Button
+                variant='contained'
+                onClick={onCompareClicked}
+                disabled={disabledButton}
+              >
+                Compare
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
       </Container>
     </React.Fragment>
