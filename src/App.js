@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 
 
 import { getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
-import { Backdrop, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip, Typography } from '@mui/material';
+import { Backdrop, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from '@mui/material';
 
 
 function App()
@@ -17,6 +17,7 @@ function App()
   const [countriesID, setCountriesID] = useState([])
   const [countriesName, setCountriesName] = useState([])
   const [isLoading, setLoading] = useState(true)
+  const [year, setYear] = useState(new Date().getFullYear())
 
   const getHolidayForCountry = (country, year, types) =>
   {
@@ -166,6 +167,19 @@ function App()
     )
   }
 
+  const onInputYearChanged = (e) =>
+  {
+    // console.log('onInputYearChanged', e.target.value)
+    setYear(e.target.value)
+  }
+
+  const renderInputYear = () =>
+  {
+    return (
+      <TextField variant='outlined' value={year} type={'number'} onChange={onInputYearChanged} sx={{ m: 1 }} />
+    )
+  }
+
   const onCompareClicked = (e) =>
   {
     console.log('onCompareClicked', countriesID.join(', '), 'types', holidayTypes.join(', '))
@@ -173,7 +187,7 @@ function App()
 
     let promises = countriesID.map(ID =>
     {
-      return getHolidayForCountry(ID, 2022, holidayTypes)
+      return getHolidayForCountry(ID, year, holidayTypes)
     })
 
     Promise.all(promises)
@@ -220,6 +234,9 @@ function App()
           }
           {
             renderHolidayType()
+          }
+          {
+            renderInputYear()
           }
           <Tooltip title={tooltipButton} placement={'bottom'} arrow >
             <span>

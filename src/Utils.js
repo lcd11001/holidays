@@ -75,7 +75,7 @@ export const getHolidays = (country, year, type = ['national', 'local', 'religio
     return getHoliday(country, year, type)
         .then(response =>
         {
-            console.log('getHolidays response', response)
+            // console.log('getHolidays response', response)
             return response.data.response.holidays
         })
 }
@@ -86,7 +86,7 @@ export const getCountries = () =>
     return axios.get(url)
         .then(response =>
         {
-            console.log('getCountries response', response)
+            // console.log('getCountries response', response)
             return response.data.response.countries
         })
 }
