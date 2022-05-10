@@ -56,6 +56,13 @@ export const getHolidaysFree = async (country, year) =>
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+export const HOLIDAY_TYPE = {
+    national: 'Returns public, federal and bank holidays',
+    local: 'Returns local, regional and state holidays',
+    religious: 'Return religious holidays: buddhism, christian, hinduism, muslim, etc',
+    observance: 'Observance, Seasons, Times'
+}
+
 export const getHoliday = (country, year, type = ['national', 'local', 'religious', 'observance']) =>
 {
     // console.log('getHoliday', country, year)
@@ -70,5 +77,16 @@ export const getHolidays = (country, year, type = ['national', 'local', 'religio
         {
             console.log('getHolidays response', response)
             return response.data.response.holidays
+        })
+}
+
+export const getCountries = () =>
+{
+    const url = `${process.env.REACT_APP_API_URL}/countries?api_key=${process.env.REACT_APP_API_KEY}`
+    return axios.get(url)
+        .then(response =>
+        {
+            console.log('getCountries response', response)
+            return response.data.response.countries
         })
 }
