@@ -5,8 +5,8 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
 
-import { getHolidayFree, getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
-import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip, Typography } from '@mui/material';
+import { getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
+import { Backdrop, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip, Typography } from '@mui/material';
 
 
 function App()
@@ -16,28 +16,32 @@ function App()
   const [countries, setCountries] = useState([])
   const [countriesID, setCountriesID] = useState([])
   const [countriesName, setCountriesName] = useState([])
+  const [isLoading, setLoading] = useState(true)
 
-  // useEffect(() =>
-  // {
-  //   let holidayVN = localStorage.getItem('VN-national')
-  //   if (holidayVN)
-  //   {
-  //     console.log('holidays from local storage', JSON.parse(holidayVN))
-  //     return
-  //   }
-  //   // getHolidaysFree('VN', 2022)
-  //   getHolidays('VN', 2022, ['national'])
-  //     .then(holidays =>
-  //     {
-  //       console.log('holidays', holidays)
-  //       localStorage.setItem('VN-national', JSON.stringify(holidays, null, 2))
-  //     })
-  //     .catch(err =>
-  //     {
-  //       console.error(err)
-  //     })
+  const getHolidayForCountry = (country, year, types) =>
+  {
+    let itemName = `${country}-${year}-${types.join('-')}`
 
-  // }, [])
+    let holidayItem = localStorage.getItem(itemName)
+    if (holidayItem)
+    {
+      let holidayData = JSON.parse(holidayItem)
+      console.log(`holidays of ${itemName} from local storage`, holidayData)
+      return Promise.resolve(holidayData)
+    }
+
+    return getHolidays(country, year, types)
+      .then(holidays =>
+      {
+        console.log(`holidays of ${itemName}`, holidays)
+        localStorage.setItem(itemName, JSON.stringify(holidays, null, 2))
+        return holidays
+      })
+      .catch(err =>
+      {
+        console.error(`holidays of ${itemName} error`, err)
+      })
+  }
 
   useEffect(() =>
   {
@@ -47,6 +51,7 @@ function App()
       let jsonCountries = JSON.parse(localData)
       console.log('countries from local storage', jsonCountries)
       setSupportedCountries(jsonCountries)
+      setLoading(false)
       return;
     }
     getCountries()
@@ -55,12 +60,13 @@ function App()
         console.log('countries', data)
         localStorage.setItem('countries', JSON.stringify(data, null, 2))
         setSupportedCountries(data)
+        setLoading(false)
       })
       .catch(err =>
       {
         console.error(err)
       })
-  }, [setSupportedCountries])
+  }, [setSupportedCountries, setLoading])
 
   const onHolidayTypeChanged = (e, checked) =>
   {
@@ -163,6 +169,26 @@ function App()
   const onCompareClicked = (e) =>
   {
     console.log('onCompareClicked', countriesID.join(', '), 'types', holidayTypes.join(', '))
+    setLoading(true)
+
+    let promises = countriesID.map(ID =>
+    {
+      return getHolidayForCountry(ID, 2022, holidayTypes)
+    })
+
+    Promise.all(promises)
+      .then(allData =>
+      {
+        console.log('allData', allData)
+      })
+      .catch(err =>
+      {
+        console.err('allData error', err)
+      })
+      .finally(() =>
+      {
+        setLoading(false)
+      })
   }
 
   const renderButtonTooltip = () =>
@@ -207,6 +233,12 @@ function App()
             </span>
           </Tooltip>
         </Box>
+        <Backdrop
+          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isLoading}
+        >
+          <CircularProgress color='secondary' />
+        </Backdrop>
       </Container>
     </React.Fragment>
   );
