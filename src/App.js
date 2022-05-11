@@ -187,7 +187,8 @@ function App()
   const onInputYearChanged = (e) =>
   {
     // console.log('onInputYearChanged', e.target.value)
-    setYear(e.target.value)
+    let value = e.target.value
+    setYear(parseInt(value))
   }
 
   const renderInputYear = () =>

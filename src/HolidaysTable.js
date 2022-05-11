@@ -13,9 +13,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
         color: theme.palette.common.white,
+        minWidth: 120
     },
     [`&.${tableCellClasses.body}`]: {
         fontSize: 14,
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
     },
 }));
 
@@ -29,22 +31,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-function createData(name, calories, fat, carbs, protein)
-{
-    return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
 const HolidaysTable = ({ data, countries, countriesID, year }) =>
 {
-    const [nomalizeData, setNomalizeData] = useState([])
+    const [normalizeData, setNomalizeData] = useState([])
+    const [normalizeHeader, setNomalizeHeader] = useState([])
     let minDate = new Date(year, 0, 1);
 
     const hasFinished = (currentDataIndex, data) =>
@@ -73,6 +63,8 @@ const HolidaysTable = ({ data, countries, countriesID, year }) =>
             }
             return [country]
         })
+
+        let headers = countriesID.length === countries.length ? ["Code", "Name"] : ["Name"]
 
         let currentDataIndex = new Array(countries.length).fill(0)
 
@@ -130,38 +122,55 @@ const HolidaysTable = ({ data, countries, countriesID, year }) =>
                 currentDataIndex[row] = nextIndex
             })
 
+            headers.push(minDate)
             minDate = maxDate
         }
 
-        console.log('normalize Data', allData)
+        // console.log('normalize Data', allData)
 
         setNomalizeData(allData)
+        setNomalizeHeader(headers)
     }, [data, countries, countriesID])
+
+    const holidayColumn = countriesID.length === countries.length ? 2 : 1
 
     return (
         <TableContainer component={Paper} sx={{ margin: 1 }}>
-            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <Table sx={{ minWidth: 600 }} aria-label="customized table">
                 <TableHead>
                     <TableRow>
-                        <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-                        <StyledTableCell align="right">Calories</StyledTableCell>
-                        <StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-                        <StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-                        <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
+                        {
+                            normalizeHeader.map((header, column) => (
+                                <StyledTableCell key={column}>
+                                    {
+                                        column < holidayColumn
+                                            ? header
+                                            // https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript
+                                            : header.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
+                                    }
+                                </StyledTableCell>
+                            ))
+                        }
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
-                        <StyledTableRow key={row.name}>
-                            <StyledTableCell component="th" scope="row">
-                                {row.name}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                            <StyledTableCell align="right">{row.fat}</StyledTableCell>
-                            <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-                            <StyledTableCell align="right">{row.protein}</StyledTableCell>
-                        </StyledTableRow>
-                    ))}
+                    {
+                        normalizeData.map((row) => (
+                            <StyledTableRow key={row[0]}>
+                                {
+                                    row.map((data, column) => (
+                                        <StyledTableCell component={column < holidayColumn ? "th" : "td"} scope="row">
+                                            {
+                                                column < holidayColumn
+                                                    ? data
+                                                    : data !== null ? data.name : ''
+                                            }
+                                        </StyledTableCell>
+                                    ))
+                                }
+                            </StyledTableRow>
+                        ))
+                    }
                 </TableBody>
             </Table>
         </TableContainer>
