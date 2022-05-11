@@ -64,7 +64,9 @@ const HolidaysTable = ({ data, countries, countriesID, year }) =>
             return [country]
         })
 
-        let headers = countriesID.length === countries.length ? ["Code", "Name"] : ["Name"]
+        let headers = countries.length === 0
+            ? []
+            : countriesID.length === countries.length ? ["Code", "Name"] : ["Name"]
 
         let currentDataIndex = new Array(countries.length).fill(0)
 
@@ -159,7 +161,7 @@ const HolidaysTable = ({ data, countries, countriesID, year }) =>
                             <StyledTableRow key={row[0]}>
                                 {
                                     row.map((data, column) => (
-                                        <StyledTableCell component={column < holidayColumn ? "th" : "td"} scope="row">
+                                        <StyledTableCell key={column} component={column < holidayColumn ? "th" : "td"} scope="row">
                                             {
                                                 column < holidayColumn
                                                     ? data
