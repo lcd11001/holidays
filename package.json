@@ -18,8 +18,12 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-deploy": "env-cmd -f .env.deploy npm run build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "obfuscate": "javascript-obfuscator ./build --output ./obfuscated --compact true --control-flow-flattening false --dead-code-injection false --debug-protection false --debug-protection-interval 0 --disable-console-output true --identifier-names-generator hexadecimal --log false --rename-globals false --string-array-rotate true --self-defending true --string-array-shuffle true --split-strings true --string-array true --string-array-encoding none --string-array-threshold 0.75 --unicode-escape-sequence false ",
+    "predeploy": "call predeploy.bat",
+    "deploy": "gh-pages -d deploy"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +42,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "gh-pages": "^4.0.0",
+    "javascript-obfuscator": "^4.0.0"
   }
 }
