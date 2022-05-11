@@ -8,6 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material';
 
 import { getHolidays, getCountries, HOLIDAY_TYPE } from './Utils'
 import { Backdrop, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from '@mui/material';
+import HolidaysTable from './HolidaysTable';
 
 const ELEMENT_WIDTH = 600
 
@@ -32,6 +33,7 @@ function App()
   const [countriesName, setCountriesName] = useState([])
   const [isLoading, setLoading] = useState(true)
   const [year, setYear] = useState(new Date().getFullYear())
+  const [holidayData, setHolidayData] = useState([])
 
   const getHolidayForCountry = (country, year, types) =>
   {
@@ -99,9 +101,9 @@ function App()
   const renderHolidayType = () =>
   {
     return (
-      <FormGroup row={true} sx={{ width: ELEMENT_WIDTH }}>
+      <FormGroup row={true} sx={{ width: ELEMENT_WIDTH, justifyContent: 'space-between' }}>
         {
-          Object.keys(HOLIDAY_TYPE).map(key => (
+          Object.keys(HOLIDAY_TYPE).map((key, index) => (
             <FormControlLabel
               key={key}
               value={key}
@@ -136,6 +138,7 @@ function App()
     setCountries(values)
     setCountriesID(IDs)
     setCountriesName(names)
+    setHolidayData([])
   }
 
   const renderSelectedCountries = (selectedIDs) =>
@@ -190,7 +193,18 @@ function App()
   const renderInputYear = () =>
   {
     return (
-      <TextField variant='outlined' value={year} type={'number'} onChange={onInputYearChanged} label={'Year'} sx={{ m: 1, width: ELEMENT_WIDTH }} />
+      <TextField variant='outlined'
+        value={year}
+        type={'number'}
+        onChange={onInputYearChanged}
+        label={'Year'}
+        sx={{ m: 1, width: ELEMENT_WIDTH }}
+        InputProps={{
+          inputProps: {
+            min: 1900
+          }
+        }}
+      />
     )
   }
 
@@ -207,7 +221,8 @@ function App()
     Promise.all(promises)
       .then(allData =>
       {
-        console.log('allData', allData)
+        // console.log('allData', allData)
+        setHolidayData(allData)
       })
       .catch(err =>
       {
@@ -265,6 +280,7 @@ function App()
                 </Button>
               </span>
             </Tooltip>
+            <HolidaysTable year={year} data={holidayData} countries={countriesName} countriesID={countriesID} />
           </Box>
           <Backdrop
             sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
